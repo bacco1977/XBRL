@@ -36,6 +36,7 @@ RcppExport SEXP xbrlProcessFacts(SEXP epaDoc) {
   CharacterVector fact(fact_nodeset_ln);
   CharacterVector decimals(fact_nodeset_ln);
   CharacterVector factId(fact_nodeset_ln);
+  CharacterVector factName(fact_nodeset_ln);
   CharacterVector ns(fact_nodeset_ln);
 
   for (int i=0; i < fact_nodeset_ln; i++) {
@@ -74,9 +75,15 @@ RcppExport SEXP xbrlProcessFacts(SEXP epaDoc) {
     } else {
       factId[i] = NA_STRING;
     }
+    if ((tmp_str = xmlGetProp(fact_node, (xmlChar*) "name"))) { 
+      factName[i] = (char *) tmp_str;
+      xmlFree(tmp_str);
+    } else {
+      factName[i] = NA_STRING;
+    }
     ns[i] = (char *) fact_node->ns->href;
-  }
-  xmlXPathFreeObject(fact_res);
+    }
+   xmlXPathFreeObject(fact_res);
 
   return DataFrame::create(Named("elementId")=elementId,
 			   Named("contextId")=contextId,
@@ -84,5 +91,6 @@ RcppExport SEXP xbrlProcessFacts(SEXP epaDoc) {
 			   Named("fact")=fact,
 			   Named("decimals")=decimals,
 			   Named("factId")=factId,
+			   Named("factName")=factName,
 			   Named("ns")=ns);
 }
